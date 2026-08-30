@@ -1,4 +1,4 @@
-var CACHE_NAME = "zadachnik-cache-v1";
+var CACHE_NAME = "zadachnik-cache-v2";
 var APP_SHELL = [
   "./",
   "./index.html",
@@ -30,16 +30,19 @@ self.addEventListener("activate", function (event) {
   self.clients.claim();
 });
 
+// Network-first: always serve the freshest version when online, so a new
+// deploy shows up immediately. Only fall back to the cached copy (and to
+// the cached index.html for navigations) when there's no network.
 self.addEventListener("fetch", function (event) {
   if (event.request.method !== "GET") return;
   event.respondWith(
-    caches.match(event.request).then(function (cached) {
-      if (cached) return cached;
-      return fetch(event.request).then(function (response) {
-        var copy = response.clone();
-        caches.open(CACHE_NAME).then(function (cache) { cache.put(event.request, copy); });
-        return response;
-      }).catch(function () {
+    fetch(event.request).then(function (response) {
+      var copy = response.clone();
+      caches.open(CACHE_NAME).then(function (cache) { cache.put(event.request, copy); });
+      return response;
+    }).catch(function () {
+      return caches.match(event.request).then(function (cached) {
+        if (cached) return cached;
         if (event.request.mode === "navigate") return caches.match("./index.html");
       });
     })
