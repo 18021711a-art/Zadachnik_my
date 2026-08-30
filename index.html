@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, maximum-scale=1">
+<title>Задачник</title>
+<meta name="theme-color" content="#1c1c1e">
+<link rel="manifest" href="manifest.json">
+<link rel="icon" href="icons/icon-192.png">
+<link rel="apple-touch-icon" href="icons/icon-192.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Задачник">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<header class="topbar">
+  <h1 id="topbarTitle">Главная</h1>
+</header>
+
+<main id="app">
+
+  <!-- FEED -->
+  <section id="view-feed" class="view active">
+    <div id="feedList" class="feed-list"></div>
+    <p id="feedEmpty" class="empty-hint hidden">Задач нет. Нажмите «+», чтобы добавить первую.</p>
+  </section>
+
+  <!-- CALENDAR -->
+  <section id="view-calendar" class="view">
+    <div class="cal-header">
+      <button id="calPrev" class="icon-btn" aria-label="Предыдущий месяц">‹</button>
+      <div id="calMonthLabel" class="cal-month-label"></div>
+      <button id="calNext" class="icon-btn" aria-label="Следующий месяц">›</button>
+    </div>
+    <div class="cal-weekdays">
+      <span>Пн</span><span>Вт</span><span>Ср</span><span>Чт</span><span>Пт</span><span>Сб</span><span>Вс</span>
+    </div>
+    <div id="calGrid" class="cal-grid"></div>
+    <div id="calDayPanel" class="cal-day-panel"></div>
+  </section>
+
+  <!-- SEARCH -->
+  <section id="view-search" class="view">
+    <div class="search-bar">
+      <input id="searchInput" type="search" placeholder="Поиск задач…" autocomplete="off">
+    </div>
+    <div class="search-filters">
+      <button class="chip active" data-filter="all">Все</button>
+      <button class="chip" data-filter="active">Активные</button>
+      <button class="chip" data-filter="done">Выполненные</button>
+    </div>
+    <div id="searchResults" class="feed-list"></div>
+    <p id="searchEmpty" class="empty-hint hidden">Ничего не найдено.</p>
+  </section>
+
+</main>
+
+<button id="fab" class="fab" aria-label="Добавить задачу">+</button>
+
+<nav class="bottom-nav">
+  <button class="nav-btn active" data-view="feed">
+    <span class="nav-icon">🏠</span><span>Главная</span>
+  </button>
+  <button class="nav-btn" data-view="calendar">
+    <span class="nav-icon">📅</span><span>Календарь</span>
+  </button>
+  <button class="nav-btn" data-view="search">
+    <span class="nav-icon">🔍</span><span>Поиск</span>
+  </button>
+</nav>
+
+<!-- ADD / EDIT TASK MODAL -->
+<div id="taskModal" class="overlay hidden">
+  <div class="sheet">
+    <div class="sheet-header">
+      <button id="taskModalCancel" class="text-btn">Отмена</button>
+      <h2 id="taskModalTitle">Новая задача</h2>
+      <button id="taskModalSave" class="text-btn primary">Сохранить</button>
+    </div>
+    <div class="sheet-body">
+      <input id="taskTitleInput" class="text-input" type="text" placeholder="Название задачи" maxlength="200">
+      <button id="taskDateBtn" class="date-btn"></button>
+      <button id="taskDeleteBtn" class="delete-btn hidden">Удалить задачу</button>
+    </div>
+  </div>
+</div>
+
+<!-- DATE PICKER MODAL (used for new task date + moving a task) -->
+<div id="dateModal" class="overlay hidden">
+  <div class="sheet">
+    <div class="sheet-header">
+      <button id="dateModalCancel" class="text-btn">Отмена</button>
+      <h2>Выберите дату</h2>
+      <span class="text-btn placeholder"></span>
+    </div>
+    <div class="sheet-body">
+      <div class="quick-dates">
+        <button class="chip" data-quick="today">Сегодня</button>
+        <button class="chip" data-quick="tomorrow">Завтра</button>
+      </div>
+      <div class="cal-header">
+        <button id="pickerPrev" class="icon-btn" aria-label="Предыдущий месяц">‹</button>
+        <div id="pickerMonthLabel" class="cal-month-label"></div>
+        <button id="pickerNext" class="icon-btn" aria-label="Следующий месяц">›</button>
+      </div>
+      <div class="cal-weekdays">
+        <span>Пн</span><span>Вт</span><span>Ср</span><span>Чт</span><span>Пт</span><span>Сб</span><span>Вс</span>
+      </div>
+      <div id="pickerGrid" class="cal-grid"></div>
+    </div>
+  </div>
+</div>
+
+<script src="app.js"></script>
+</body>
+</html>
