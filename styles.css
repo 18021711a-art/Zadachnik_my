@@ -45,7 +45,8 @@ button, input {
   border-bottom: 1px solid var(--border);
 }
 .topbar-row { display: flex; align-items: center; gap: 12px; }
-.topbar h1 { margin: 0; font-size: 20px; font-weight: 800; color: var(--text); }
+.topbar h1 { margin: 0; font-size: 20px; font-weight: 800; color: var(--text); flex: 1; }
+.topbar-action { margin-left: auto; font-size: 16px; }
 .brand-avatar {
   width: 36px;
   height: 36px;
@@ -214,7 +215,8 @@ button, input {
   text-align: left;
   border-bottom: 1px solid var(--border);
 }
-.task-actions-sheet button:last-child { border-bottom: none; color: var(--danger); }
+.task-actions-sheet button:last-child { border-bottom: none; }
+.task-actions-sheet button.danger { color: var(--danger); }
 
 /* Bottom nav */
 .bottom-nav {

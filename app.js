@@ -202,7 +202,7 @@
       sheet.appendChild(pickBtn);
     }
 
-    var deleteBtn = el("button", null, task.repeat ? "Удалить повторяющуюся задачу" : "Удалить задачу");
+    var deleteBtn = el("button", "danger", task.repeat ? "Удалить повторяющуюся задачу" : "Удалить задачу");
     deleteBtn.addEventListener("click", function () {
       var msg = task.repeat
         ? "Удалить повторяющуюся задачу «" + task.title + "» и всю её историю?"
@@ -534,6 +534,83 @@
       datePickerCallback && datePickerCallback(dateStr);
       closeDatePicker();
     });
+  });
+
+  // ---------- EXPORT / IMPORT (moving data to another phone) ----------
+  var dataMenuBtn = document.getElementById("dataMenuBtn");
+  var importFileInput = document.getElementById("importFileInput");
+
+  function isValidTask(t) {
+    return !!t && typeof t.id === "string" && typeof t.title === "string" && typeof t.date === "string";
+  }
+
+  function exportTasks() {
+    var payload = JSON.stringify({ app: "zadachnik", exportedAt: new Date().toISOString(), tasks: tasks }, null, 2);
+    var filename = "zadachnik-" + todayISO() + ".json";
+    var blob = new Blob([payload], { type: "application/json" });
+
+    if (navigator.canShare && window.File) {
+      var file = new File([blob], filename, { type: "application/json" });
+      if (navigator.canShare({ files: [file] })) {
+        navigator.share({ files: [file], title: "Задачник — экспорт задач" }).catch(function () {});
+        return;
+      }
+    }
+    var url = URL.createObjectURL(blob);
+    var a = document.createElement("a");
+    a.href = url;
+    a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    setTimeout(function () { URL.revokeObjectURL(url); }, 2000);
+  }
+
+  importFileInput.addEventListener("change", function () {
+    var file = importFileInput.files[0];
+    importFileInput.value = "";
+    if (!file) return;
+    var reader = new FileReader();
+    reader.onload = function () {
+      var parsed;
+      try {
+        parsed = JSON.parse(reader.result);
+      } catch (e) {
+        alert("Не удалось прочитать файл: это не похоже на экспорт из Задачника.");
+        return;
+      }
+      var importedTasks = Array.isArray(parsed) ? parsed : (parsed && Array.isArray(parsed.tasks) ? parsed.tasks : null);
+      if (!importedTasks || !importedTasks.every(isValidTask)) {
+        alert("Файл повреждён или это не экспорт из Задачника.");
+        return;
+      }
+      if (!confirm("Заменить все текущие задачи на этом телефоне (" + tasks.length + ") данными из файла (" + importedTasks.length + ")? Отменить это будет нельзя.")) return;
+      tasks = importedTasks;
+      saveTasks(tasks);
+      refreshCurrentView();
+      if (views.calendar.classList.contains("active")) renderCalendar();
+      alert("Импортировано задач: " + importedTasks.length);
+    };
+    reader.readAsText(file);
+  });
+
+  dataMenuBtn.addEventListener("click", function () {
+    var overlay = el("div", "task-actions-overlay");
+    var sheet = el("div", "task-actions-sheet");
+
+    var exportBtn = el("button", null, "Экспортировать задачи (поделиться файлом)");
+    exportBtn.addEventListener("click", function () { close(); exportTasks(); });
+
+    var importBtn = el("button", null, "Импортировать из файла");
+    importBtn.addEventListener("click", function () { close(); importFileInput.click(); });
+
+    sheet.appendChild(exportBtn);
+    sheet.appendChild(importBtn);
+    overlay.appendChild(sheet);
+    document.body.appendChild(overlay);
+
+    function close() { overlay.remove(); }
+    overlay.addEventListener("click", function (e) { if (e.target === overlay) close(); });
   });
 
   // ---------- FAB ----------
